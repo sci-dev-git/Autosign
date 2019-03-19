@@ -16,24 +16,29 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  *  Lesser General Public License for more details.
  */
+ 
+const request = require('request');
 
+const appid = "wxc3469260fe597347";
+const appsecret = ""; // keep it out from GIT please!!!
+ 
 /**
  * Get the session key and openid of WeChat users.
  * See https://developers.weixin.qq.com/miniprogram/dev/api-backend/code2Session.html for reference.
- * @param appid Acquired from WeChat application.
- * @param secret AppSecret that is acquired from WeChat.
+ * @param appid Acquired from Wechat application.
+ * @param secret AppSecret that is acquired from Wechat.
  * @param jscode The code acquired by wx.login() interface.
  * @param closure function(res) to receive the result: {errcode: x, openid: y, session_key: z}
  */
-function code2Session(appid, secret, jscode, callback) {
+module.exports.code2Session = function (jscode, callback) {
   var options = {
-    url: `https://api.weixin.qq.com/sns/jscode2session?appid=${appid}&secret=${secret}&js_code=${jscode}&grant_type=authorization_code`
+    url: `https://api.weixin.qq.com/sns/jscode2session?appid=${appid}&secret=${appsecret}&js_code=${jscode}&grant_type=authorization_code`
   };
 
   request.get(options, function(err, response, body) {
     if (!err) {
       var resp = JSON.parse(response.body);
-      if (!resp.errcode) {
+      if (typeof(resp.errcode) == "undefined" || !resp.errcode) {
         callback({errcode: 0, openid: resp.openid, session_key: resp.session_key});
         return;
       }

@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "w-button": "/components/w-button/index",
+    "w-indicator": "/components/w-activity-indicator/index"
+  }
+}

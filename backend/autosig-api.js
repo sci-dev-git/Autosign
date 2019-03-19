@@ -23,7 +23,6 @@
 const mysql       = require('mysql');
 const express     = require('express');
 const crypto      = require('crypto');
-const request     = require('request');
 const config      = require('./autosig-config');
 const util        = require('./autosig-util');
 const wxsupports  = require('./wx-supports');
@@ -34,11 +33,16 @@ var md5 = crypto.createHash('md5');
 var rsa = require('node-rsa');
 const rsa_bits = 512;
 
-
-function packResult(code, body) {
-  var response = {'code': code, 'body': body};
+/**
+ * Pack the response message of all the APIs. {errcode: x, body: y}
+ * @param errcode Error code.
+ * @param body Message body. Could be a object.
+ */
+function packResult(errcode, body) {
+  var response = {'errcode': errcode, 'body': body};
   return JSON.stringify(response);
 }
+/** Get error message for MySQL. */
 function errorMsgSQL(err) {
   return err.code + '(' + err.errno + ') ' + err.sqlMessage;
 }
@@ -254,13 +258,47 @@ app.get('/alter_ssid', (req, res) => {
   });
 });
 
+/**
+ * Interface of GET query_bind_status.
+ * @param jscode The code acquired by wx.login() interface.
+ */
+app.get('/query_bind_status', (req, res) => {
+  /*
+   * Validate parameters
+   */
+  if (typeof(req.query.jscode) == 'undefined') {
+    res.send(packResult(config.EMISSING_PARAMEETR, undefined));
+    return;
+  }
+  wxsupports.code2Session(req.query.jscode, function (session) {
+    if (session.errcode) {
+      res.send(packResult(session.errcode, undefined));
+      return;
+    }
+    /*
+     * Search for the openid acquired from Wechat client in the summary students table.
+     */
+    sqlClient.query(`use ${config.DATABASE_GLOBAL};`);
+    sqlClient.query(`SELECT * FROM ${config.TABLE_SUMMARY_STUDENTS} WHERE wx_openid = '${session.openid}';`,
+      function select_callback(err, results, fields) {
+        if (err) {
+          res.send(packResult(config.EFAULT, {msg: errorMsgSQL(err)}));
+          return;
+        }
+        if(results.length)
+          res.send(packResult(config.EOK, {status: true}));
+        else
+          res.send(packResult(config.EOK, {status: false}));
+      });
+  });
+});
 
 /*
  * Connect to the database and startup server
  */
 sqlClient.connect(function(err, result) {
   if(err) {
-    console.error(`Error: failed to connect to MySQL server @${MYSQL_PASSWD}.`);
+    console.error(`Error: failed to connect to MySQL server @${config.MYSQL_PASSWD}.`);
     throw err;
   }
   
@@ -320,7 +358,8 @@ sqlClient.connect(function(err, result) {
                                             wx_openid text NOT NULL,
                                             token text NOT NULL,
                                             private_key text NOT NULL,
-                                            public_key text NOT NULL
+                                            public_key text NOT NULL,
+                                            PRIMARY KEY (gid)
                                             );`);
                   /** Create a table for courses
                    * @field cid   Unique, course ID. 
@@ -334,17 +373,21 @@ sqlClient.connect(function(err, result) {
                                             name text NOT NULL,
                                             teacher int NOT NULL,
                                             classrom text NOT NULL,
-                                            timerule text NOT NULL);`);
+                                            timerule text NOT NULL,
+                                            PRIMARY KEY (cid)
+                                            );`);
                   /** create a table for course selections
                     * @field gid    Group ID, which identifies a group of students who takes the same courses.
                     * @field cid    Course ID.
                     */
                   sqlClient.query(`CREATE TABLE ${config.TABLE_COURSE_SELECTION} (
-                                            gid int(32) NOT NULL AUTO_INCREMENT,
+                                            gid int(32) NOT NULL,
                                             cid int(32) NOT NULL);`);
                   // create signature statist table
                   sqlClient.query(`CREATE TABLE ${config.TABLE_SIG_STATIS} (
-                                            sigid int(32) NOT NULL AUTO_INCREMENT);`);
+                                            sigid int(32) NOT NULL AUTO_INCREMENT,
+                                            PRIMARY KEY (sigid)
+                                            );`);
                 } else throw err;
               });
             } else throw err;

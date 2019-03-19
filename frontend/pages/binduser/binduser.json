@@ -1,0 +1,12 @@
+{
+  "usingComponents": {
+    "w-form": "/components/w-form/index",
+    "w-pane": "/components/w-pane/index",
+    "w-cell": "/components/w-cell/index",
+    "w-cell-group": "/components/w-cell-group/index",
+    "w-cell-picker": "/components/w-cell-picker/index",
+    "w-input": "/components/w-input/index",
+    "w-validate": "/components/w-validate/index",
+    "w-button": "/components/w-button/index"
+  }
+}
