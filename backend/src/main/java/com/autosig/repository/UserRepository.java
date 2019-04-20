@@ -20,16 +20,16 @@ import com.autosig.domain.UserBase;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface UserRepository extends MongoRepository<UserBase, String> {
-	/**
-	 * Find user by OpenID
-	 * @param openId Target User OpenID
-	 * @return UserBase referenced to the user data
-	 */
-	UserBase findByOpenId(String openId);
-	
-	/**
-	 * Delete User
-	 * @param openId	Identify of user.
-	 */
-	void deleteByOpenId(String openId);
+    /**
+     * Find user by OpenID
+     * @param openId Target User OpenID
+     * @return UserBase referenced to the user data
+     */
+    UserBase findByOpenId(String openId);
+
+    /**
+     * Delete User
+     * @param openId  Identify of user.
+     */
+    void deleteByOpenId(String openId);
 }

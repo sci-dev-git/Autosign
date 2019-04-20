@@ -18,6 +18,6 @@
 package com.autosig.util;
 
 public class Constants {
-	public static final long TOKEN_EXPIRES_HOUR = 6;
-	public static final long SECS_PER_HOURS = 3600;
+    public static final long TOKEN_EXPIRES_HOUR = 6;
+    public static final long SECS_PER_HOURS = 3600;
 }

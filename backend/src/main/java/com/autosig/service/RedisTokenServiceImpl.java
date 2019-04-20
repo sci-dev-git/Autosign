@@ -12,19 +12,19 @@
  *  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  SEE THE GNU
  *  LESSER GENERAL PUBLIC LICENSE FOR MORE DETAILS.
  */
-package com.autosig.manager;
+package com.autosig.service;
 
 import com.autosig.util.Constants;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.data.redis.core.RedisTemplate;
 
-@Component
-public class RedisTokenManagerImpl implements TokenManager {
+@Service
+public class RedisTokenServiceImpl implements TokenService {
 
-	@Autowired
+    @Autowired
     private RedisTemplate<String, String> redis;
 
     public String createToken(String openId) {
@@ -41,7 +41,7 @@ public class RedisTokenManagerImpl implements TokenManager {
      * @return reference to an array, [0] is openId and [1] is uuid.
      */
     private String[] parseToken(String token) {
-    	if (token == null || token.length() == 0) {
+        if (token == null || token.length() == 0) {
             return null;
         }
         String[] param = token.split("_");
@@ -52,18 +52,18 @@ public class RedisTokenManagerImpl implements TokenManager {
     }
     
     public String getOpenId(String token) {
-    	String[] param = parseToken(token);
-    	if (param == null)
-    		return null;
-    	return param[0];
+        String[] param = parseToken(token);
+        if (param == null)
+            return null;
+        return param[0];
     }
     
     public boolean authToken(String token) {
-    	String[] param = parseToken(token);
-    	if (param == null)
-    		return false;
-    	
-    	String openId = param[0];
+        String[] param = parseToken(token);
+        if (param == null)
+            return false;
+      
+        String openId = param[0];
         String uuid = param[1];
         
         String localUUID = redis.boundValueOps(openId).get();
@@ -79,6 +79,6 @@ public class RedisTokenManagerImpl implements TokenManager {
     }
 
     public void deauthToken(String openId) {
-		redis.delete(openId);
+        redis.delete(openId);
     }
 }

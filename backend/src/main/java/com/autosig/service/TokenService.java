@@ -15,14 +15,14 @@
  *  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  SEE THE GNU
  *  LESSER GENERAL PUBLIC LICENSE FOR MORE DETAILS.
  */
-package com.autosig.manager;
+package com.autosig.service;
 
-public interface TokenManager {
-	/**
-	 * Create a token for logging.
-	 * @param openId
-	 * @return token created.
-	 */
+public interface TokenService {
+    /**
+     * Create a token for logging.
+     * @param openId
+     * @return token created.
+     */
     public String createToken(String openId);
     
     /**

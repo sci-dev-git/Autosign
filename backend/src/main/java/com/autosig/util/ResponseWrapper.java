@@ -23,12 +23,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.autosig.error.commonError;
 
 public class ResponseWrapper {
-	public static String wrapResponse(commonError status, HashMap<String, Object> data) {
-		JSONObject json = new JSONObject();
+    public static String wrapResponse(commonError status, HashMap<String, Object> data) {
+        JSONObject json = new JSONObject();
 
-		json.put("status", status.packageError());
-		json.put("data", data);
-		
-		return json.toJSONString();
-	}
+        json.put("status", status.packageError());
+        json.put("data", data);
+      
+        return json.toJSONString();
+    }
 }

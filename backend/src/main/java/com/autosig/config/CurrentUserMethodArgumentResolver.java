@@ -36,9 +36,9 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
  */
 @Component
 public class CurrentUserMethodArgumentResolver implements HandlerMethodArgumentResolver {
-	@Autowired
-	private UserRepository userRepository;
-	
+    @Autowired
+    private UserRepository userRepository;
+
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.getParameterType().isAssignableFrom(UserBase.class)

@@ -21,11 +21,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "users")
 public class UserBase {
-	/** identify, fixed after registration */
-	private String openId;
+  /** identify, fixed after registration */
+  private String openId;
     /** Type of this user, fixed after registration */
     private UserType type;
-	/** The secondary ID code of this user */
+  /** The secondary ID code of this user */
     private String code;
     /** Real name */
     private String realName;
@@ -35,43 +35,43 @@ public class UserBase {
     /*
      * Getter/Setter
      */
-	public String getCode() {
-		return code;
-	}
+  public String getCode() {
+    return code;
+  }
 
-	public String getRealName() {
-		return realName;
-	}
+  public String getRealName() {
+    return realName;
+  }
 
-	public void setRealName(String realName) {
-		this.realName = realName;
-	}
+  public void setRealName(String realName) {
+    this.realName = realName;
+  }
 
-	public void setCode(String code) {
-		this.code = code;
-	}
+  public void setCode(String code) {
+    this.code = code;
+  }
 
-	public String getOpenId() {
-		return openId;
-	}
+  public String getOpenId() {
+    return openId;
+  }
 
-	public void setOpenId(String openId) {
-		this.openId = openId;
-	}
+  public void setOpenId(String openId) {
+    this.openId = openId;
+  }
 
-	public UserType getType() {
-		return type;
-	}
+  public UserType getType() {
+    return type;
+  }
 
-	public void setType(UserType type) {
-		this.type = type;
-	}
+  public void setType(UserType type) {
+    this.type = type;
+  }
 
-	public String getPassword() {
-		return password;
-	}
+  public String getPassword() {
+    return password;
+  }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+  public void setPassword(String password) {
+    this.password = password;
+  }
 }

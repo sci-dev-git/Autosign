@@ -18,35 +18,28 @@
 package com.autosig.service;
 import com.autosig.domain.UserBase;
 import com.autosig.error.commonError;
-import com.autosig.error.authorizationError;
 
 public interface UserService {
-	/**
-	 * Register a user.
-	 * @param user Target user.
-	 * @return common error code.
-	 */
-	public commonError registerUser(UserBase user);
-	
-	/**
-	 * User authority.
-	 * @param openId Target OpenID acquired by wx.
-	 * @param code Secondary ID.
-	 * @param password Encoded password.
-	 * @return authorization error pack.
-	 */
-	public authorizationError authorizeUser(String openId, String code, String password);
-	
-	/**
-	 * User Deauthorization.
-	 * @param openId Target OpenID acquired by wx.
-	 */
-	public void deauthUser(String openId);
-	
-	/**
-	 * Get the information of a user by its OpenID.
-	 * @param id Target OpenID
-	 * @return reference to userbase
-	 */
-	public UserBase getUserByOpenId(String id);
+    /**
+     * Register a user.
+     * @param user Target user.
+     * @return common error code.
+     */
+    public commonError registerUser(UserBase user);
+
+    /**
+     * User authority.
+     * @param openId Target OpenID acquired by wx.
+     * @param code Secondary ID.
+     * @param password Encoded password.
+     * @return authorization error pack.
+     */
+    public commonError authorizeUser(String openId, String code, String password);
+
+    /**
+     * Get the information of a user by its OpenID.
+     * @param id Target OpenID
+     * @return reference to userbase
+     */
+    public UserBase getUserByOpenId(String id);
 }

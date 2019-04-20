@@ -27,7 +27,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import com.autosig.annotation.Authorization;
 import com.autosig.error.commonError;
-import com.autosig.manager.TokenManager;
+import com.autosig.service.TokenService;
 import com.autosig.util.ResponseWrapper;
 
 /**
@@ -37,11 +37,11 @@ import com.autosig.util.ResponseWrapper;
 public class AuthorizationInterceptor implements HandlerInterceptor {
 
     @Autowired
-    private TokenManager tokenManager;
+    private TokenService tokenService;
 
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response, Object handler) throws Exception {
-    	/* Passing when not a handler method */
+        /* Passing when not a handler method */
         if (!(handler instanceof HandlerMethod)) {
             return true;
         }
@@ -51,23 +51,23 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         
         /* do filter only when the method is annotated with @Authorization. */
         if (method.getAnnotation(Authorization.class) != null) {
-	        /*
-	         * Get token from the request header, then validating the token
-	         * through token manager
-	         */
-	        String token = request.getParameter("token");
-	        
-	        if (token != null && tokenManager.authToken(token)) {
-	        	/* succeeded. Store the openId, corresponding to the token, to the request for later injection. */
-	            request.setAttribute("currentUser", tokenManager.getOpenId(token));
-	            return true;
-	        }
-	
-	        /*
-	         * Return HTTP 401 error with common error message as the authorization
-	         * of token has been failed.
-	         */
-	        String resp = ResponseWrapper.wrapResponse(commonError.E_TOKEN_AUTH, null);
+            /*
+             * Get token from the request header, then validating the token
+             * through token manager
+             */
+            String token = request.getParameter("token");
+          
+            if (token != null && tokenService.authToken(token)) {
+                /* succeeded. Store the openId, corresponding to the token, to the request for later injection. */
+                request.setAttribute("currentUser", tokenService.getOpenId(token));
+                return true;
+            }
+          
+            /*
+             * Return HTTP 401 error with common error message as the authorization
+             * of token has been failed.
+             */
+            String resp = ResponseWrapper.wrapResponse(commonError.E_TOKEN_AUTH, null);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getOutputStream().print(resp);
             return false;

@@ -23,11 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Configuration
 public class WebConfiguration implements WebMvcConfigurer {
-	@Autowired
-	private CurrentUserMethodArgumentResolver currentUserMethodArgumentResolver;
-	@Autowired
-	private AuthorizationInterceptor authorizationInterceptor;
-	
+    @Autowired
+    private CurrentUserMethodArgumentResolver currentUserMethodArgumentResolver;
+    @Autowired
+    private AuthorizationInterceptor authorizationInterceptor;
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authorizationInterceptor)

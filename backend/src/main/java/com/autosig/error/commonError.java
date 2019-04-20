@@ -20,24 +20,24 @@ package com.autosig.error;
 import com.alibaba.fastjson.JSONObject;
 
 public enum commonError {
-	E_OK,
-	E_FAULT,
-	E_TOKEN_AUTH,
-	E_USER_EXISTING,
-	E_USER_NON_EXISTING,
-	E_PASSWORD_INVALID;
-	
-	/**
-	 * Pack this error to mapping.
-	 * @return JSON object contains the information of this status.
-	 * 	field:	status : Status code in integer.
-	 * 			status_msg : Status text in detail.
-	 */
-	public JSONObject packageError() {
-		JSONObject result = new JSONObject();
-		
-		result.put("code", this.ordinal());
-    	result.put("msg", this.name());
-    	return result;
-	}
+    E_OK,
+    E_FAULT,
+    E_TOKEN_AUTH,
+    E_USER_EXISTING,
+    E_USER_NON_EXISTING,
+    E_PASSWORD_INVALID;
+  
+    /**
+     * Pack this error to mapping.
+     * @return JSON object contains the information of this status.
+     *  field:  status : Status code in integer.
+     *      status_msg : Status text in detail.
+     */
+    public JSONObject packageError() {
+        JSONObject result = new JSONObject();
+    
+        result.put("code", this.ordinal());
+        result.put("msg", this.name());
+        return result;
+    }
 }
