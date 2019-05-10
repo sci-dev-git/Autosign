@@ -19,7 +19,9 @@ package com.autosig.service;
 
 import com.autosig.repository.UserRepository;
 import com.autosig.domain.UserBase;
+import com.autosig.domain.GroupBase;
 import com.autosig.error.commonError;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +66,31 @@ public class UserServiceImpl implements UserService {
         } catch(Exception exp) {
             exp.printStackTrace();
             return null;
+        }
+    }
+    
+    public commonError addGroup(UserBase user, GroupBase group) {
+        try {
+            commonError rc = user.addGroup(group.getUid());
+            if (rc.succeeded()) {
+                userRepository.save(user);
+            }
+            return rc;
+        } catch(Exception exp) {
+            exp.printStackTrace();
+            return commonError.E_FAULT;
+        }
+    }
+    public commonError deleteGroup(UserBase user, GroupBase group) {
+        try {
+            commonError rc = user.removeGroup(group.getUid());
+            if (rc.succeeded()) {
+                userRepository.save(user);
+            }
+            return rc;
+        } catch(Exception exp) {
+            exp.printStackTrace();
+            return commonError.E_FAULT;
         }
     }
 }

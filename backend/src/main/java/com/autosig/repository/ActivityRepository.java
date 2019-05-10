@@ -1,10 +1,9 @@
 /** @file
- * Wrap response in form of JSON.
+ * IActivityRepository
  */
-
 /*
  *  Autosig (Backend server for autosig management program in WeChat-App)
- *  Copyright (C) 2019, TYUT-404 team. Developer <diyer175@hotmail.com>.
+ *  Copyright (C) 2019, TYUT-404 Team. Developer <diyer175@hotmail.com>.
  *
  *  THIS PROJECT IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR
  *  MODIFY IT UNDER THE TERMS OF THE GNU LESSER GENERAL PUBLIC LICENSE(GPL)
@@ -16,18 +15,21 @@
  *  MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.  SEE THE GNU
  *  LESSER GENERAL PUBLIC LICENSE FOR MORE DETAILS.
  */
-package com.autosig.util;
+package com.autosig.repository;
+import com.autosig.domain.ActivityBase;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.alibaba.fastjson.JSONObject;
-import com.autosig.error.commonError;
+public interface ActivityRepository extends MongoRepository<ActivityBase, String> {
+    /**
+     * Find Activity by uid
+     * @param uuid
+     * @return ActivityBase referenced to the user data
+     */
+    ActivityBase findByUid(String uid);
 
-public class ResponseWrapper {
-    public static String wrapResponse(commonError status, JSONObject data) {
-        JSONObject json = new JSONObject();
-
-        json.put("status", status.packageError());
-        json.put("data", data);
-      
-        return json.toJSONString();
-    }
+    /**
+     * Delete Activity by uid
+     * @param uuid.
+     */
+    void deleteByUid(String uid);
 }

@@ -16,14 +16,16 @@
  *  LESSER GENERAL PUBLIC LICENSE FOR MORE DETAILS.
  */
 package com.autosig.service;
+
 import com.autosig.domain.UserBase;
+import com.autosig.domain.GroupBase;
 import com.autosig.error.commonError;
 
 public interface UserService {
     /**
      * Register a user.
      * @param user Target user.
-     * @return common error code.
+     * @return common status code.
      */
     public commonError registerUser(UserBase user);
 
@@ -37,9 +39,24 @@ public interface UserService {
     public commonError authorizeUser(String openId, String code, String password);
 
     /**
-     * Get the information of a user by its OpenID.
+     * Get the instance reference of a user by its OpenID.
      * @param id Target OpenID
      * @return reference to userbase
      */
     public UserBase getUserByOpenId(String id);
+    
+    /**
+     * Add a group to user.
+     * @param user Target User.
+     * @param group Source Group
+     * @return common status code.
+     */
+    public commonError addGroup(UserBase user, GroupBase group);
+    /**
+     * Delete a group from user. Warning: group will NOT be removed from database.
+     * @param user Target User.
+     * @param group Source Group
+     * @return common status code.
+     */
+    public commonError deleteGroup(UserBase user, GroupBase group);
 }

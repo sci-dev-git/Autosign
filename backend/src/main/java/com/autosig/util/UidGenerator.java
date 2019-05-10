@@ -1,7 +1,6 @@
 /** @file
- * Wrap response in form of JSON.
+ * UID (uniformed ID) generator.
  */
-
 /*
  *  Autosig (Backend server for autosig management program in WeChat-App)
  *  Copyright (C) 2019, TYUT-404 team. Developer <diyer175@hotmail.com>.
@@ -18,16 +17,10 @@
  */
 package com.autosig.util;
 
-import com.alibaba.fastjson.JSONObject;
-import com.autosig.error.commonError;
+import java.util.UUID;
 
-public class ResponseWrapper {
-    public static String wrapResponse(commonError status, JSONObject data) {
-        JSONObject json = new JSONObject();
-
-        json.put("status", status.packageError());
-        json.put("data", data);
-      
-        return json.toJSONString();
+public class UidGenerator {
+    public static String randomUid() {
+        return UUID.randomUUID().toString().replace("-", "");
     }
 }

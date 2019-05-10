@@ -18,24 +18,24 @@
 package com.autosig.domain;
 
 public enum UserType {
-  /** Attendee means the member of a group. */
-  USER_ATTENDEE(0),
-  /** Manager means the organizer and leader of the group */
-  USER_MANAGER(1);
+    /** Attendee means the member of a group. */
+    USER_ATTENDEE(0),
+    /** Manager means the organizer and leader of the group */
+    USER_MANAGER(1);
   
-  private int value;
+    private int value;
     private UserType(int value) {
         this.value = value;
     }
     
     public String getName() {
-      switch (this.value) {
-        case 0:
-          return "Attendee";
-        case 1:
-          return "Manager";
-      default:
-        return "unknown";
-      }
+        switch (this.value) {
+            case 0:
+                return "Attendee";
+            case 1:
+                return "Manager";
+            default:
+                return "unknown";
+        }
     }
 }

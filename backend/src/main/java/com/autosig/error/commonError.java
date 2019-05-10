@@ -22,11 +22,19 @@ import com.alibaba.fastjson.JSONObject;
 public enum commonError {
     E_OK,
     E_FAULT,
+    E_SERVER_FAULT,
     E_TOKEN_AUTH,
     E_USER_EXISTING,
     E_USER_NON_EXISTING,
-    E_PASSWORD_INVALID;
-  
+    E_PASSWORD_INVALID,
+    E_PERMISSION_DENIED,
+    E_GROUP_EXISTING,
+    E_GROUP_NON_EXISTING,
+    E_ACTIVITY_EXISTING,
+    E_ACTIVITY_NON_EXISTING,
+    E_TASK_EXISTING,
+    E_TASK_NON_EXISTING;
+
     /**
      * Pack this error to mapping.
      * @return JSON object contains the information of this status.
@@ -39,5 +47,16 @@ public enum commonError {
         result.put("code", this.ordinal());
         result.put("msg", this.name());
         return result;
+    }
+    
+    /**
+     * To indicate whether the code represents a succeeded operation
+     * @return boolean True if succeeded.
+     */
+    public boolean succeeded() {
+        return (this.ordinal() == E_OK.ordinal());
+    }
+    public boolean failed() {
+        return !this.succeeded();
     }
 }

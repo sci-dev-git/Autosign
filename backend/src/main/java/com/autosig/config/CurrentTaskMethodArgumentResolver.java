@@ -1,5 +1,5 @@
 /** @file
- * Parameter Parser for the UserBase param annotated with @CurrentUser.
+ * Parameter Parser for the GroupBase param annotated with @CurrentTask.
  */
 /*
  *  Autosig (Backend server for autosig management program in WeChat-App)
@@ -17,8 +17,8 @@
  */
 package com.autosig.config;
 
-import com.autosig.domain.UserBase;
-import com.autosig.annotation.CurrentUser;
+import com.autosig.domain.TaskBase;
+import com.autosig.annotation.CurrentTask;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -29,22 +29,22 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 /**
- * Implement methods injection, witch inject methods annotated with @CurrentUser into CurrentUser.
+ * Implement methods injection, witch inject methods annotated with @CurrentTask.
  */
 @Component
-public class CurrentUserMethodArgumentResolver implements HandlerMethodArgumentResolver {
+public class CurrentTaskMethodArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().isAssignableFrom(UserBase.class)
-                && parameter.hasParameterAnnotation(CurrentUser.class);
+        return parameter.getParameterType().isAssignableFrom(TaskBase.class)
+                && parameter.hasParameterAnnotation(CurrentTask.class);
     }
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        UserBase user = (UserBase) webRequest.getAttribute("currentUser", RequestAttributes.SCOPE_REQUEST);
-        if (user != null) {
-            return user;
+        TaskBase task = (TaskBase) webRequest.getAttribute("currentRoutine", RequestAttributes.SCOPE_REQUEST);
+        if (task != null) {
+            return task;
         }
-        throw new MissingServletRequestPartException("currentUser");
+        throw new MissingServletRequestPartException("currentRoutine");
     }
 }

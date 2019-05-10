@@ -26,16 +26,29 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Autowired
     private CurrentUserMethodArgumentResolver currentUserMethodArgumentResolver;
     @Autowired
+    private CurrentGroupMethodArgumentResolver currentGroupMethodArgumentResolver;
+    @Autowired
+    private CurrentActivityMethodArgumentResolver currentAcitivityMethodArgumentResolver;
+    @Autowired
+    private CurrentTaskMethodArgumentResolver currentTaskMethodArgumentResolver;
+    @Autowired
     private AuthorizationInterceptor authorizationInterceptor;
+    @Autowired
+    private RoutineResolverInterceptor routineResolverInterceptor;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authorizationInterceptor)
                 .addPathPatterns("/**"); /* Filter all the request, checking request method annotated with @Authorization */
+        registry.addInterceptor(routineResolverInterceptor)
+                .addPathPatterns("/**");
     }
     
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(currentUserMethodArgumentResolver);
+        argumentResolvers.add(currentGroupMethodArgumentResolver);
+        argumentResolvers.add(currentAcitivityMethodArgumentResolver);
+        argumentResolvers.add(currentTaskMethodArgumentResolver);
     }
 }

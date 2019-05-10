@@ -22,6 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Documented;
+import com.autosig.domain.UserType;
 
 /**
  * Annotation for method that required logged-in status.
@@ -30,4 +31,8 @@ import java.lang.annotation.Documented;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Authorization {
+    /** Set this property if particular user type is required. */
+    boolean userLimited() default false;
+    /** Indicate which type the user is required. */
+    UserType userType() default UserType.USER_ATTENDEE;
 }

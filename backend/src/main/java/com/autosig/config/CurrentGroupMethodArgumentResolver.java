@@ -1,5 +1,5 @@
 /** @file
- * Parameter Parser for the UserBase param annotated with @CurrentUser.
+ * Parameter Parser for the GroupBase param annotated with @CurrentGroup.
  */
 /*
  *  Autosig (Backend server for autosig management program in WeChat-App)
@@ -17,8 +17,8 @@
  */
 package com.autosig.config;
 
-import com.autosig.domain.UserBase;
-import com.autosig.annotation.CurrentUser;
+import com.autosig.domain.GroupBase;
+import com.autosig.annotation.CurrentGroup;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -29,22 +29,22 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 /**
- * Implement methods injection, witch inject methods annotated with @CurrentUser into CurrentUser.
+ * Implement methods injection, witch inject methods annotated with @CurrentGroup.
  */
 @Component
-public class CurrentUserMethodArgumentResolver implements HandlerMethodArgumentResolver {
+public class CurrentGroupMethodArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().isAssignableFrom(UserBase.class)
-                && parameter.hasParameterAnnotation(CurrentUser.class);
+        return parameter.getParameterType().isAssignableFrom(GroupBase.class)
+                && parameter.hasParameterAnnotation(CurrentGroup.class);
     }
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        UserBase user = (UserBase) webRequest.getAttribute("currentUser", RequestAttributes.SCOPE_REQUEST);
-        if (user != null) {
-            return user;
+        GroupBase group = (GroupBase) webRequest.getAttribute("currentRoutine", RequestAttributes.SCOPE_REQUEST);
+        if (group != null) {
+            return group;
         }
-        throw new MissingServletRequestPartException("currentUser");
+        throw new MissingServletRequestPartException("currentRoutine");
     }
 }

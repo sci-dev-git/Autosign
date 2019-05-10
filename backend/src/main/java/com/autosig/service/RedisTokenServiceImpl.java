@@ -15,7 +15,7 @@
 package com.autosig.service;
 
 import com.autosig.util.Constants;
-import java.util.UUID;
+import com.autosig.util.UidGenerator;
 import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class RedisTokenServiceImpl implements TokenService {
     private RedisTemplate<String, String> redis;
 
     public String createToken(String openId) {
-        String uuid = UUID.randomUUID().toString().replace("-", "");
+        String uuid = UidGenerator.randomUid();
         String token = openId +  '_' + uuid;
         
         redis.boundValueOps(openId).set(uuid, Constants.TOKEN_EXPIRES_HOUR, TimeUnit.HOURS);

@@ -1,5 +1,5 @@
 /** @file
- * Parameter Parser for the UserBase param annotated with @CurrentUser.
+ * Parameter Parser for the ActivityBase param annotated with @CurrentActivity
  */
 /*
  *  Autosig (Backend server for autosig management program in WeChat-App)
@@ -17,8 +17,8 @@
  */
 package com.autosig.config;
 
-import com.autosig.domain.UserBase;
-import com.autosig.annotation.CurrentUser;
+import com.autosig.domain.ActivityBase;
+import com.autosig.annotation.CurrentActivity;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -29,22 +29,22 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
 /**
- * Implement methods injection, witch inject methods annotated with @CurrentUser into CurrentUser.
+ * Implement methods injection, witch inject methods annotated with @CurrentActivity.
  */
 @Component
-public class CurrentUserMethodArgumentResolver implements HandlerMethodArgumentResolver {
+public class CurrentActivityMethodArgumentResolver implements HandlerMethodArgumentResolver {
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().isAssignableFrom(UserBase.class)
-                && parameter.hasParameterAnnotation(CurrentUser.class);
+        return parameter.getParameterType().isAssignableFrom(ActivityBase.class)
+                && parameter.hasParameterAnnotation(CurrentActivity.class);
     }
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        UserBase user = (UserBase) webRequest.getAttribute("currentUser", RequestAttributes.SCOPE_REQUEST);
-        if (user != null) {
-            return user;
+        ActivityBase activity = (ActivityBase) webRequest.getAttribute("currentRoutine", RequestAttributes.SCOPE_REQUEST);
+        if (activity != null) {
+            return activity;
         }
-        throw new MissingServletRequestPartException("currentUser");
+        throw new MissingServletRequestPartException("currentRoutine");
     }
 }

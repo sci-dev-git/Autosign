@@ -1,5 +1,5 @@
 /** @file
- * annotation - @CurrentUser
+ * annotation - @RoutineResolver
  */
 /*
  *  Autosig (Backend server for autosig management program in WeChat-App)
@@ -24,10 +24,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Documented;
 
 /**
- * Annotation for parameetr that acts as current user.
+ * Annotation for method that required @CurrentGroup @CurrentActivity and @CurrentTask
  */
-@Target(ElementType.PARAMETER)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface CurrentUser { 
+public @interface RoutineResolver {
+    enum routineType {
+        GROUP, ACTIVITY, TASK
+    }
+    /** Indicates the type of target routine. */
+    routineType type() default routineType.GROUP;
 }

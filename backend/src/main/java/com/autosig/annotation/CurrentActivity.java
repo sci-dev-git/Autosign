@@ -1,5 +1,5 @@
 /** @file
- * annotation - @CurrentUser
+ * annotation - @CurrentActivity
  */
 /*
  *  Autosig (Backend server for autosig management program in WeChat-App)
@@ -29,5 +29,5 @@ import java.lang.annotation.Documented;
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface CurrentUser { 
+public @interface CurrentActivity {
 }
