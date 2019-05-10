@@ -29,12 +29,12 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.JSONArray;
 import com.autosig.error.commonError;
 import com.autosig.annotation.Authorization;
-import com.autosig.annotation.CurrentUser;
 import com.autosig.annotation.CurrentGroup;
 import com.autosig.annotation.RoutineResolver;
 import com.autosig.domain.ActivityBase;
 import com.autosig.domain.GroupBase;
 import com.autosig.domain.UserBase;
+import com.autosig.domain.UserType;
 import com.autosig.service.RoutineService;
 import com.autosig.service.UserService;
 import com.autosig.util.ResponseWrapper;
@@ -54,6 +54,7 @@ public class GroupController {
      */
     @RequestMapping(value = "/group/add_member", method = RequestMethod.GET)
     @RoutineResolver(type = RoutineResolver.routineType.GROUP)
+    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
     public String addMember(@CurrentGroup GroupBase group,
             @RequestParam(value="usr_openid") String usrOpenId) {
 
@@ -74,6 +75,7 @@ public class GroupController {
      */
     @RequestMapping(value = "/group/remove_member", method = RequestMethod.GET)
     @RoutineResolver(type = RoutineResolver.routineType.GROUP)
+    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
     public String removeMember(@CurrentGroup GroupBase group,
             @RequestParam(value="usr_openid") String usrOpenId) {
 
@@ -117,6 +119,7 @@ public class GroupController {
      */
     @RequestMapping(value = "/group/create_activity", method = RequestMethod.GET)
     @RoutineResolver(type = RoutineResolver.routineType.GROUP)
+    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
     public String createActivity(@CurrentGroup GroupBase group,
             @RequestParam(value="name") String name) {
         
@@ -142,6 +145,7 @@ public class GroupController {
      */
     @RequestMapping(value = "/group/remove_activity", method = RequestMethod.GET)
     @RoutineResolver(type = RoutineResolver.routineType.GROUP)
+    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
     public String removeActivity(@CurrentGroup GroupBase group,
             @RequestParam(value="activity_uid") String activityUid) {
 
@@ -173,6 +177,35 @@ public class GroupController {
         
         body.put("size", activities.size());
         body.put("activities", activities);
+        return ResponseWrapper.wrapResponse(commonError.E_OK, body);
+    }
+    
+    /**
+     * API for group manager to rename Group.
+     * @param uid Uniformed ID of the target group
+     * @param name New name string.
+     * @return
+     */
+    @RequestMapping(value = "/group/rename", method = RequestMethod.GET)
+    @RoutineResolver(type = RoutineResolver.routineType.GROUP)
+    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
+    public String rename(@CurrentGroup GroupBase group,
+            @RequestParam(value="name") String name) {
+        
+        commonError rc = routineService.renameGroup(group, name);
+        return ResponseWrapper.wrapResponse(rc, null);
+    }
+    
+    /**
+     * API for group manager to get information of Group.
+     * @param uid Uniformed ID of the target group
+     * @return
+     */
+    @RequestMapping(value = "/group/info", method = RequestMethod.GET)
+    @RoutineResolver(type = RoutineResolver.routineType.GROUP)
+    public String info(@CurrentGroup GroupBase group) {
+        JSONObject body = new JSONObject();
+        body.put("group", group);
         return ResponseWrapper.wrapResponse(commonError.E_OK, body);
     }
 }

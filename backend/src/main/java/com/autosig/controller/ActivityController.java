@@ -28,9 +28,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.alibaba.fastjson.JSONObject;
 import com.autosig.error.commonError;
 import com.autosig.annotation.RoutineResolver;
+import com.autosig.annotation.Authorization;
 import com.autosig.annotation.CurrentActivity;
 import com.autosig.domain.ActivityBase;
 import com.autosig.domain.TaskBase;
+import com.autosig.domain.UserType;
 import com.autosig.service.RoutineService;
 import com.autosig.util.ResponseWrapper;
 
@@ -47,6 +49,7 @@ public class ActivityController {
      */
     @RequestMapping(value = "/activity/create_task", method = RequestMethod.GET)
     @RoutineResolver(type = RoutineResolver.routineType.ACTIVITY)
+    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
     public String createTask(@CurrentActivity ActivityBase activity,
             @RequestParam(value="name") String name) {
 
@@ -72,6 +75,7 @@ public class ActivityController {
      */
     @RequestMapping(value = "/activity/remove_task", method = RequestMethod.GET)
     @RoutineResolver(type = RoutineResolver.routineType.ACTIVITY)
+    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
     public String removeTask(@CurrentActivity ActivityBase activity,
             @RequestParam(value="task_uid") String taskUid) {
 
@@ -103,6 +107,19 @@ public class ActivityController {
         
         body.put("size", tasks.size());
         body.put("tasks", tasks);
+        return ResponseWrapper.wrapResponse(commonError.E_OK, body);
+    }
+    
+    /**
+     * API for group manager to get information of Activity.
+     * @param uid Uniformed ID of the target group
+     * @return
+     */
+    @RequestMapping(value = "/activity/info", method = RequestMethod.GET)
+    @RoutineResolver(type = RoutineResolver.routineType.ACTIVITY)
+    public String info(@CurrentActivity ActivityBase activity) {
+        JSONObject body = new JSONObject();
+        body.put("activity", activity);
         return ResponseWrapper.wrapResponse(commonError.E_OK, body);
     }
 }

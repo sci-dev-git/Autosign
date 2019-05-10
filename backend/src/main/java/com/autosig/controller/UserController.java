@@ -188,4 +188,22 @@ public class UserController {
         body.put("groups", groups);
         return ResponseWrapper.wrapResponse(commonError.E_OK, body);
     }
+    
+    /**
+     * API for getting information of User.
+     * @param openid Uniformed ID of the target user
+     * @return
+     */
+    @RequestMapping(value = "/usr/info", method = RequestMethod.GET)
+    public String info(@RequestParam(value="openid") String openId) {
+        
+        UserBase user = userService.getUserByOpenId(openId);
+        if (user == null) {
+            return ResponseWrapper.wrapResponse(commonError.E_USER_NON_EXISTING, null);
+        }
+        
+        JSONObject body = new JSONObject();
+        body.put("usr", user.getBasicInfo());
+        return ResponseWrapper.wrapResponse(commonError.E_OK, body);
+    }
 }

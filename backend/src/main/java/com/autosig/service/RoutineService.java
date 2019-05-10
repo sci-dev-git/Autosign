@@ -102,4 +102,11 @@ public interface RoutineService {
      * @return
      */
     public commonError removeActivityTask(ActivityBase activity, TaskBase task);
+    
+    /**
+     * Rename the Group.
+     * @param group Target group
+     * @param name New name string.
+     */
+    public commonError renameGroup(GroupBase group, String name);
 }

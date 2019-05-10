@@ -198,4 +198,15 @@ public class RoutineServiceImpl implements RoutineService {
             return commonError.E_FAULT;
         }
     }
+    
+    public commonError renameGroup(GroupBase group, String name) {
+        try {
+            group.setName(name);
+            groupRepository.save(group);
+            return commonError.E_OK;
+        } catch(Exception exp) {
+            exp.printStackTrace();
+            return commonError.E_FAULT;
+        }
+    }
 }
