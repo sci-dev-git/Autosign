@@ -1,6 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "w-cell-picker": "../w-cell-picker/index"
-  }
-}

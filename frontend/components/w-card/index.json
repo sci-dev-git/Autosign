@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "w-col": "../w-col/index",
-    "w-row": "../w-row/index"
-  }
-}

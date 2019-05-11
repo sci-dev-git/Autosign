@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "w-tabs": "../w-tabs/index",
-    "w-segmented-control": "../w-segmented-control/index"
-  }
-}

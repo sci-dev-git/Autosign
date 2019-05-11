@@ -1,7 +1,0 @@
-{
-  "component": true,
-  "usingComponents": {
-    "w-activity-indicator": "../w-activity-indicator/index",
-    "w-icon": "../w-icon/index"
-  }
-}

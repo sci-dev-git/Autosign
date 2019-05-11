@@ -1,7 +1,0 @@
-<view
- class="wuss-class wuss-layout-row"
- hover-class="none"
- hover-stop-propagation="false"
->
-	<slot/>
-</view>

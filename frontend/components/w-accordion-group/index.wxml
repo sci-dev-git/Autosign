@@ -1,4 +1,0 @@
-<view class="wuss-class wuss-accordion-group">
-	<slot/>
-</view>
-
