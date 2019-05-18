@@ -33,12 +33,19 @@ public class TaskBase {
     public String place;
     /** indicate who hosts or manages this task */
     public String host;
+    /** openId of creator */
+    public String creatorOpenId;
     
     public TaskBase() {
     }
     public TaskBase(boolean allocUid) {
         if (allocUid)
             this.uid = UidGenerator.randomUid();
+    }
+    
+    @Override
+    public boolean equals(Object src) {
+        return uid.compareTo(((TaskBase)src).uid) == 0;
     }
     
     /*
@@ -68,4 +75,11 @@ public class TaskBase {
     public void setHost(String host) {
         this.host = host;
     }
+    public String getCreatorOpenId() {
+        return creatorOpenId;
+    }
+    public void setCreatorOpenId(String creatorOpenId) {
+        this.creatorOpenId = creatorOpenId;
+    }
 }
+

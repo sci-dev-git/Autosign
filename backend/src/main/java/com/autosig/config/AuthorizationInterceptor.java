@@ -66,16 +66,6 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
                 String openId = tokenService.getOpenId(token);
                 UserBase user = userRepository.findByOpenId(openId); /* acquire the user from repository */
 
-                /*
-                 * Validate user type if required, returning permission denied error when failed.
-                 */
-                if (authAnnotation.userLimited() && user.getType() != authAnnotation.userType()) {
-                    String resp = ResponseWrapper.wrapResponse(commonError.E_PERMISSION_DENIED, null);
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.getOutputStream().print(resp);
-                    return false;
-                }
-                
                 /* succeeded. Store the openId, corresponding to the token, to the request for later injection. */
                 request.setAttribute("currentUser", user);
                 return true;

@@ -29,7 +29,7 @@ public class RedisTokenServiceImpl implements TokenService {
 
     public String createToken(String openId) {
         String uuid = UidGenerator.randomUid();
-        String token = openId +  '_' + uuid;
+        String token = openId +  '@' + uuid;
         
         redis.boundValueOps(openId).set(uuid, Constants.TOKEN_EXPIRES_HOUR, TimeUnit.HOURS);
         return token;
@@ -44,7 +44,7 @@ public class RedisTokenServiceImpl implements TokenService {
         if (token == null || token.length() == 0) {
             return null;
         }
-        String[] param = token.split("_");
+        String[] param = token.split("@");
         if (param.length != 2) {
             return null;
         }

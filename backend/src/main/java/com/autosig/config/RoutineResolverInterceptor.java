@@ -70,7 +70,7 @@ public class RoutineResolverInterceptor implements HandlerInterceptor {
                 error = commonError.E_TASK_NON_EXISTING;
                 break;
             }
-            
+           
             if (routine == null) {
                 String resp = ResponseWrapper.wrapResponse(error, null);
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);

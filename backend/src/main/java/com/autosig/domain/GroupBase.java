@@ -19,6 +19,8 @@ package com.autosig.domain;
 
 import java.util.List;
 import java.util.LinkedList;
+
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
 
@@ -32,10 +34,14 @@ public class GroupBase {
     public String uid;
     /** The name of this group */
     public String name;
-    /** list of Members ID references */
-    public List<String> members;
-    /** list of activities ID references */
-    public List<String> activities;
+    /** openId of creator */
+    public String creatorOpenId;
+    /** list of Members references */
+    @DBRef
+    public List<UserBase> members;
+    /** list of activities references */
+    @DBRef
+    public List<ActivityBase> activities;
     
     public GroupBase() {
         this.init();
@@ -47,8 +53,13 @@ public class GroupBase {
     }
     
     private void init() {
-        this.members = new LinkedList<String>();
-        this.activities = new LinkedList<String>();
+        this.members = new LinkedList<UserBase>();
+        this.activities = new LinkedList<ActivityBase>();
+    }
+    
+    @Override
+    public boolean equals(Object src) {
+        return uid.compareTo(((GroupBase)src).uid) == 0;
     }
     
     /*
@@ -57,57 +68,62 @@ public class GroupBase {
     public String getUid() {
         return uid;
     }
-
     public void setUid(String uid) {
         this.uid = uid;
+    }
+    
+    public String getCreatorOpenId() {
+        return creatorOpenId;
+    }
+    public void setCreatorOpenId(String creatorOpenId) {
+        this.creatorOpenId = creatorOpenId;
     }
 
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
 
-    public List<String> getMembers() {
+    public List<UserBase> getMembers() {
         return members;
     }
 
-    public List<String> getActivities() {
+    public List<ActivityBase> getActivities() {
         return activities;
     }
 
     /*
      * Operations on lists
      */
-    public commonError addMember(String userId) {
-        if (members.contains(userId)) {
+    public commonError addMember(UserBase user) {
+        if (members.contains(user)) {
             return commonError.E_USER_EXISTING; /* disable duplicated adding */
         }
-        this.members.add(userId);
+        this.members.add(user);
         return commonError.E_OK;
     }
-    public commonError removeMember(String userId) {
-        if (!members.contains(userId)) {
+    public commonError removeMember(UserBase user) {
+        if (!members.contains(user)) {
             return commonError.E_USER_NON_EXISTING;
         }
-        this.members.remove(userId);
+        this.members.remove(user);
         return commonError.E_OK;
     }
     
-    public commonError addActivity(String activityId) {
-        if (activities.contains(activityId)) {
+    public commonError addActivity(ActivityBase activity) {
+        if (activities.contains(activity)) {
             return commonError.E_ACTIVITY_EXISTING; /* disable duplicated adding */
         }
-        this.activities.add(activityId);
+        this.activities.add(activity);
         return commonError.E_OK;
     }
-    public commonError removeActivity(String activityId) {
-        if (!activities.contains(activityId)) {
+    public commonError removeActivity(ActivityBase activity) {
+        if (!activities.contains(activity)) {
             return commonError.E_ACTIVITY_NON_EXISTING;
         }
-        this.activities.remove(activityId);
+        this.activities.remove(activity);
         return commonError.E_OK;
     }
     

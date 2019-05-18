@@ -30,11 +30,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.autosig.error.commonError;
 import com.autosig.annotation.Authorization;
 import com.autosig.annotation.CurrentGroup;
+import com.autosig.annotation.CurrentUser;
 import com.autosig.annotation.RoutineResolver;
 import com.autosig.domain.ActivityBase;
 import com.autosig.domain.GroupBase;
 import com.autosig.domain.UserBase;
-import com.autosig.domain.UserType;
 import com.autosig.service.RoutineService;
 import com.autosig.service.UserService;
 import com.autosig.util.ResponseWrapper;
@@ -49,42 +49,30 @@ public class GroupController {
     /**
      * API for group manager to attach a User as its member.
      * @paeam uid Uniformed ID of target Group.
-     * @param usr_openid Uniformed ID of source user.
      * @return
      */
     @RequestMapping(value = "/group/add_member", method = RequestMethod.GET)
     @RoutineResolver(type = RoutineResolver.routineType.GROUP)
-    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
-    public String addMember(@CurrentGroup GroupBase group,
-            @RequestParam(value="usr_openid") String usrOpenId) {
+    @Authorization
+    public String addMember(@CurrentUser UserBase user,
+            @CurrentGroup GroupBase group) {
 
-        UserBase user = userService.getUserByOpenId(usrOpenId);
-        if (user == null) {
-            return ResponseWrapper.wrapResponse(commonError.E_USER_NON_EXISTING, null);
-        }
-        
-        commonError rc = routineService.addGroupMember(group, user);
+        commonError rc = userService.attendGroup(user, group);
         return ResponseWrapper.wrapResponse(rc, null);
     }
     
     /**
      * API for group manager to remove a member User.
      * @paeam uid Uniformed ID of target Group.
-     * @param usr_openid Uniformed ID of source user.
      * @return
      */
     @RequestMapping(value = "/group/remove_member", method = RequestMethod.GET)
     @RoutineResolver(type = RoutineResolver.routineType.GROUP)
-    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
-    public String removeMember(@CurrentGroup GroupBase group,
-            @RequestParam(value="usr_openid") String usrOpenId) {
+    @Authorization
+    public String removeMember(@CurrentUser UserBase user,
+            @CurrentGroup GroupBase group) {
 
-        UserBase user = userService.getUserByOpenId(usrOpenId);
-        if (user == null) {
-            return ResponseWrapper.wrapResponse(commonError.E_USER_NON_EXISTING, null);
-        }
-        
-        commonError rc = routineService.removeGroupMember(group, user);
+        commonError rc = userService.quitGroup(user, group);
         return ResponseWrapper.wrapResponse(rc, null);
     }
     
@@ -100,9 +88,10 @@ public class GroupController {
         JSONObject body = new JSONObject();
         JSONArray users = new JSONArray();
 
-        List<String> memberIds = group.getMembers(); /* resolve instances of all the users */
-        for(int i=0; i < memberIds.size(); i++) {
-            UserBase user = userService.getUserByOpenId(memberIds.get(i));
+        List<UserBase> members = group.getMembers();
+        int size = members.size();
+        for(int i=0; i < size; i++) {
+            UserBase user = members.get(i);
             users.add(user.getBasicInfo());
         }
         
@@ -119,17 +108,20 @@ public class GroupController {
      */
     @RequestMapping(value = "/group/create_activity", method = RequestMethod.GET)
     @RoutineResolver(type = RoutineResolver.routineType.GROUP)
-    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
-    public String createActivity(@CurrentGroup GroupBase group,
+    @Authorization
+    public String createActivity(@CurrentUser UserBase user,
+            @CurrentGroup GroupBase group,
             @RequestParam(value="name") String name) {
         
-        ActivityBase activity = new ActivityBase(true); /* create instance of activity */
+        if (group.getCreatorOpenId().compareTo(user.getOpenId()) != 0) { /* validate ownership */
+            return ResponseWrapper.wrapResponse(commonError.E_PERMISSION_DENIED, null);
+        }
+        
+        ActivityBase activity = new ActivityBase(true);
         activity.setName(name);
         
-        commonError rc = routineService.createActivity(activity);
+        commonError rc = userService.createActivity(group, activity);
         if (rc.succeeded()) {
-            rc = routineService.addGroupActivity(group, activity);
-            
             JSONObject body = new JSONObject();
             body.put("uid", activity.getUid());
             return ResponseWrapper.wrapResponse(rc, body);
@@ -145,16 +137,20 @@ public class GroupController {
      */
     @RequestMapping(value = "/group/remove_activity", method = RequestMethod.GET)
     @RoutineResolver(type = RoutineResolver.routineType.GROUP)
-    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
-    public String removeActivity(@CurrentGroup GroupBase group,
+    @Authorization
+    public String removeActivity(@CurrentUser UserBase user,
+            @CurrentGroup GroupBase group,
             @RequestParam(value="activity_uid") String activityUid) {
 
+        if (group.getCreatorOpenId().compareTo(user.getOpenId()) != 0) { /* validate ownership */
+            return ResponseWrapper.wrapResponse(commonError.E_PERMISSION_DENIED, null);
+        }
         ActivityBase activity = routineService.getActivityByUid(activityUid);
         if (activity == null) {
             return ResponseWrapper.wrapResponse(commonError.E_ACTIVITY_NON_EXISTING, null);
         }
         
-        commonError rc = routineService.removeGroupActivity(group, activity);
+        commonError rc = userService.deleteActivity(group, activity);
         return ResponseWrapper.wrapResponse(rc, null);
     }
     
@@ -170,9 +166,10 @@ public class GroupController {
         JSONObject body = new JSONObject();
         List<ActivityBase> activities = new ArrayList<ActivityBase>();
         
-        List<String> activityIds = group.getActivities();
-        for(int i=0; i < activityIds.size(); i++) {
-            activities.add(routineService.getActivityByUid(activityIds.get(i)) );
+        List<ActivityBase> activitys = group.getActivities();
+        int size = activitys.size();
+        for(int i=0; i < size; i++) {
+            activities.add(activitys.get(i));
         }
         
         body.put("size", activities.size());
@@ -188,9 +185,14 @@ public class GroupController {
      */
     @RequestMapping(value = "/group/rename", method = RequestMethod.GET)
     @RoutineResolver(type = RoutineResolver.routineType.GROUP)
-    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
-    public String rename(@CurrentGroup GroupBase group,
+    @Authorization
+    public String rename(@CurrentUser UserBase user,
+            @CurrentGroup GroupBase group,
             @RequestParam(value="name") String name) {
+        
+        if (group.getCreatorOpenId().compareTo(user.getOpenId()) != 0) { /* validate ownership */
+            return ResponseWrapper.wrapResponse(commonError.E_PERMISSION_DENIED, null);
+        }
         
         commonError rc = routineService.renameGroup(group, name);
         return ResponseWrapper.wrapResponse(rc, null);

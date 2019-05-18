@@ -32,10 +32,11 @@ import com.autosig.service.TokenService;
 import com.autosig.util.ResponseWrapper;
 import com.autosig.domain.GroupBase;
 import com.autosig.domain.UserBase;
-import com.autosig.domain.UserType;
 import com.autosig.error.commonError;
 import com.autosig.annotation.CurrentUser;
+import com.autosig.annotation.RoutineResolver;
 import com.autosig.annotation.Authorization;
+import com.autosig.annotation.CurrentGroup;
 
 @RestController
 public class UserController {
@@ -48,8 +49,8 @@ public class UserController {
 
     /**
      * API for User Registration.
-     * @param openid Uniformed OpenID of the new user.
-     * @param type User type (Attendee or Manager)
+     * @param openId OpenId acquired from login.
+     * @param place Registration place.
      * @param code Secondary ID of the user.
      * @param real_name Real name of this user.
      * @param password Encoded password.
@@ -57,22 +58,16 @@ public class UserController {
      */
     @RequestMapping(value = "/usr/reg", method = RequestMethod.GET)
     public String reg(@RequestParam(value="openid") String openId,
-                          @RequestParam(value="type") int type,
+                         @RequestParam(value="place") String place,
                           @RequestParam(value="code") String code,
-                          @RequestParam(value="real_name") String real_name,
-                          @RequestParam(value="password") String password) {
-        if (type < 0 || type > 1) {
-            return ResponseWrapper.wrapResponse(commonError.E_FAULT, null);
-        }
-    
+                          @RequestParam(value="real_name") String real_name) {
+
         UserBase user = new UserBase();
-        UserType userType = UserType.values()[type];
     
         user.setOpenId(openId);
-        user.setType(userType);
+        user.setPlace(place);
         user.setCode(code);
         user.setRealName(real_name);
-        user.setPassword(password);
         
         commonError rc = userService.registerUser(user);
         return ResponseWrapper.wrapResponse(rc, null);
@@ -80,26 +75,27 @@ public class UserController {
   
     /**
      * User Login authorization.
-     * @param openid Uniformed OpenID of the new user.
-     * @param code Secondary ID of the user.
-     * @param password Encoded password.
+     * @param wxcode Internal code acquired from wx.
      * @return
      */
     @RequestMapping(value = "/usr/login", method = RequestMethod.GET)
-    public String login(@RequestParam(value="openid") String openId,
-                              @RequestParam(value="code") String code,
-                              @RequestParam(value="password") String password) {
-        JSONObject body = new JSONObject();
-      
-        /* authorized the identify of user */
-        commonError result = userService.authorizeUser(openId, code, password);
-        
-        if (result == commonError.E_OK) {
-            String token = tokenService.createToken(openId); /* create token for later accessing */
-            body.put("token", token);
-        }
-        
-        return ResponseWrapper.wrapResponse(result, body);
+    public String login(@RequestParam(value="wxcode") String wxcode) {
+        String openId = userService.getOpenId(wxcode);
+        if (openId != null) {
+            JSONObject body = new JSONObject();
+            body.put("openId", openId);
+
+            /* Authorized the identify of user */
+            UserBase user = userService.getUserByOpenId(openId);
+            
+            if (user != null) {
+                String token = tokenService.createToken(openId); /* create token for later accessing */
+                body.put("token", token);
+                return ResponseWrapper.wrapResponse(commonError.E_OK, body);
+            } else
+                return ResponseWrapper.wrapResponse(commonError.E_USER_NON_EXISTING, body);
+        } else
+            return ResponseWrapper.wrapResponse(commonError.E_FAULT, null);
     }
     
     /**
@@ -114,6 +110,23 @@ public class UserController {
         return ResponseWrapper.wrapResponse(commonError.E_OK, null);
     }
     
+    @RequestMapping(value = "/usr/door", method = RequestMethod.GET)
+    public String door(@RequestParam(value="openid") String openId) {
+        
+        JSONObject body = new JSONObject();
+        body.put("openId", openId);
+
+        /* Authorized the identify of user */
+        UserBase user = userService.getUserByOpenId(openId);
+        
+        if (user != null) {
+            String token = tokenService.createToken(openId); /* create token for later accessing */
+            body.put("token", token);
+            return ResponseWrapper.wrapResponse(commonError.E_OK, body);
+        } else
+            return ResponseWrapper.wrapResponse(commonError.E_USER_NON_EXISTING, body);
+    }
+    
     
     /**
      * API for Group Creation.
@@ -121,23 +134,18 @@ public class UserController {
      * @return uid = Uniformed ID of the new group
      */
     @RequestMapping(value = "/usr/create_group", method = RequestMethod.GET)
-    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
-    
+    @Authorization
     public String createGroup(@CurrentUser UserBase user,
             @RequestParam(value="name") String name) {
         
-        GroupBase group = new GroupBase(true); /* create instance of group */
+        GroupBase group = new GroupBase(true);
         group.setName(name);
 
-        commonError rc = routineService.createGroup(group);
+        commonError rc = userService.createGroup(user, group);
         if (rc.succeeded()) {
-            
-            rc = userService.addGroup(user, group);
-            if (rc.succeeded()) {
-                JSONObject body = new JSONObject();
-                body.put("uid", group.getUid());
-                return ResponseWrapper.wrapResponse(rc, body);
-            }
+            JSONObject body = new JSONObject();
+            body.put("uid", group.getUid());
+            return ResponseWrapper.wrapResponse(rc, body);
         }
         return ResponseWrapper.wrapResponse(rc, null);
     }
@@ -148,40 +156,37 @@ public class UserController {
      * @return
      */
     @RequestMapping(value = "/usr/remove_group", method = RequestMethod.GET)
-    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
-    
+    @RoutineResolver(type = RoutineResolver.routineType.GROUP)
+    @Authorization
     public String removeGroup(@CurrentUser UserBase user,
-            @RequestParam(value="uid") String uid) {
+            @CurrentGroup GroupBase group) {
         
-        GroupBase group = routineService.getGroupByUid(uid);
-        if (group == null) {
-            return ResponseWrapper.wrapResponse(commonError.E_GROUP_NON_EXISTING, null);
+        if (group.getCreatorOpenId().compareTo(user.getOpenId()) != 0) { /* validate ownership */
+            return ResponseWrapper.wrapResponse(commonError.E_PERMISSION_DENIED, null);
         }
         
-        commonError rc = userService.deleteGroup(user, group); /* FIXME: deal with this dependency */
-        if (rc.succeeded()) {
-            rc = routineService.deleteGroup(group);
-        }
+        commonError rc = userService.deleteGroup(user, group);
         return ResponseWrapper.wrapResponse(rc, null);
     }
     
     /**
-     * API for Getting all Groups created.
-     * @param uid Uniformed ID of the target group
+     * API for Getting all Groups created by this user.
      * @return
      */
-    @RequestMapping(value = "/usr/get_groups", method = RequestMethod.GET)
-    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
-    
-    public String getGroups(@CurrentUser UserBase user,
-            @RequestParam(value="uid") String uid) {
+    @RequestMapping(value = "/usr/get_created_groups", method = RequestMethod.GET)
+    @Authorization
+    public String getCreatedGroups(@CurrentUser UserBase user) {
         
         JSONObject body = new JSONObject();
-        List<GroupBase> groups = new ArrayList<GroupBase>();
-        List<String> groupIds = user.getGroups();
         
-        for(int i=0; i < groupIds.size();i++) {
-            groups.add(routineService.getGroupByUid(groupIds.get(i)) );
+        /*
+         * Resolve all the groups from repository
+         */
+        List<GroupBase> groups = new ArrayList<GroupBase>();
+        List<String> groupIds = user.getCreatedGroups();
+        int size = groupIds.size();
+        for(int i=0; i < size; i++) {
+            groups.add(routineService.getGroupByUid(groupIds.get(i)));
         }
         
         body.put("size", groups.size());

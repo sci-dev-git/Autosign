@@ -19,6 +19,8 @@ package com.autosig.domain;
 
 import java.util.List;
 import java.util.LinkedList;
+
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
 
@@ -32,8 +34,11 @@ public class ActivityBase {
     public String uid;
     /** name (i.e main title) of this activity */
     public String name;
-    /** list of Task references Id */
-    List<String> tasks;
+    /** openId of creator */
+    public String creatorOpenId;
+    /** list of Task references */
+    @DBRef
+    List<TaskBase> tasks;
 
     public ActivityBase() {
         this.init();
@@ -45,24 +50,29 @@ public class ActivityBase {
     }
     
     private void init() {
-        this.tasks = new LinkedList<String>();
+        this.tasks = new LinkedList<TaskBase>();
+    }
+    
+    @Override
+    public boolean equals(Object src) {
+        return uid.compareTo(((ActivityBase)src).uid) == 0;
     }
     
     /*
      * Operations on lists
      */
-    public commonError addTask(String taskId) {
-        if (tasks.contains(taskId)) {
+    public commonError addTask(TaskBase task) {
+        if (tasks.contains(task)) {
             return commonError.E_TASK_EXISTING; /* disable duplicated adding */
         }
-        this.tasks.add(taskId);
+        this.tasks.add(task);
         return commonError.E_OK;
     }
-    public commonError removeTask(String taskId) {
-        if (!tasks.contains(taskId)) {
+    public commonError removeTask(TaskBase task) {
+        if (!tasks.contains(task)) {
             return commonError.E_TASK_NON_EXISTING;
         }
-        this.tasks.remove(taskId);
+        this.tasks.remove(task);
         return commonError.E_OK;
     }
     
@@ -81,8 +91,14 @@ public class ActivityBase {
     public void setName(String name) {
         this.name = name;
     }
+    public String getCreatorOpenId() {
+        return creatorOpenId;
+    }
+    public void setCreatorOpenId(String creatorOpenId) {
+        this.creatorOpenId = creatorOpenId;
+    }
 
-    public List<String> getTasks() {
+    public List<TaskBase> getTasks() {
         return tasks;
     }
 }

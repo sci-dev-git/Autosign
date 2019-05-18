@@ -29,19 +29,25 @@ public class UserBase {
     /** identify, fixed after registration */
     @Id
     private String openId;
-    /** Type of this user, fixed after registration */
-    private UserType type;
     /** The secondary ID code of this user */
     private String code;
     /** Real name */
     private String realName;
-    /** Encoded password */
-    private String password;
-    /** list of groups ID references, only for USER_MANAGER */
-    public List<String> groups;
-    
+    /** User place */
+    private String place;
+    /** list of created group uid */
+    public List<String> createdGroups;
+    /** list of attended group uid */
+    public List<String> attendedGroups;
+
     public UserBase() {
-        this.groups = new LinkedList<String>();
+        this.createdGroups = new LinkedList<String>();
+        this.attendedGroups = new LinkedList<String>();
+    }
+    
+    @Override
+    public boolean equals(Object src) {
+        return openId.compareTo(((UserBase)src).openId) == 0;
     }
     
     /*
@@ -56,11 +62,11 @@ public class UserBase {
     public String getRealName() {
         return realName;
     }
-    public List<String> getGroups() {
-        return groups;
+    public String getPlace() {
+        return place;
     }
-    public String getPassword() {
-        return password;
+    public List<String> getCreatedGroups() {
+        return createdGroups;
     }
     
     public void setRealName(String realName) {
@@ -69,34 +75,42 @@ public class UserBase {
     public void setCode(String code) {
         this.code = code;
     }
+    public void setPlace(String place) {
+        this.place = code;
+    }
     public void setOpenId(String openId) {
         this.openId = openId;
-    }
-    public UserType getType() {
-        return type;
-    }
-    public void setType(UserType type) {
-        this.type = type;
-    }
-    public void setPassword(String password) {
-        this.password = password;
     }
     
     /*
      * Operations on lists
      */
-    public commonError addGroup(String groupId) {
-        if (groups.contains(groupId)) {
+    public commonError addCreatedGroup(String groupId) {
+        if (createdGroups.contains(groupId)) {
             return commonError.E_GROUP_EXISTING;
         }
-        groups.add(groupId);
+        createdGroups.add(groupId);
         return commonError.E_OK;
     }
-    public commonError removeGroup(String groupId) {
-        if (!groups.contains(groupId)) {
+    public commonError removeCreatedGroup(String groupId) {
+        if (!createdGroups.contains(groupId)) {
             return commonError.E_GROUP_NON_EXISTING;
         }
-        groups.remove(groupId);
+        createdGroups.remove(groupId);
+        return commonError.E_OK;
+    }
+    public commonError addAttendedGroup(String groupId) {
+        if (attendedGroups.contains(groupId)) {
+            return commonError.E_GROUP_EXISTING;
+        }
+        attendedGroups.add(groupId);
+        return commonError.E_OK;
+    }
+    public commonError removeAttendedGroup(String groupId) {
+        if (!attendedGroups.contains(groupId)) {
+            return commonError.E_GROUP_NON_EXISTING;
+        }
+        attendedGroups.remove(groupId);
         return commonError.E_OK;
     }
     

@@ -23,8 +23,6 @@ import com.autosig.repository.TaskRepository;
 import com.autosig.domain.ActivityBase;
 import com.autosig.domain.GroupBase;
 import com.autosig.domain.TaskBase;
-import com.autosig.domain.UserBase;
-import com.autosig.domain.UserType;
 import com.autosig.error.commonError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -39,50 +37,6 @@ public class RoutineServiceImpl implements RoutineService {
     @Autowired
     private TaskRepository taskRepository;
     
-    /*
-     * Create entry in database
-     */
-    public commonError createGroup(GroupBase group) {
-        try {
-            groupRepository.save(group);
-            return commonError.E_OK; /* succeeded */
-        } catch(Exception exp) {
-            exp.printStackTrace();
-            return commonError.E_FAULT;
-        }
-    }
-    public commonError createActivity(ActivityBase activity) {
-        try {
-            activityRepository.save(activity);
-            return commonError.E_OK; /* succeeded */
-        } catch(Exception exp) {
-            exp.printStackTrace();
-            return commonError.E_FAULT;
-        }
-    }
-    public commonError createTask(TaskBase task) {
-        try {
-            taskRepository.save(task);
-            return commonError.E_OK; /* succeeded */
-        } catch(Exception exp) {
-            exp.printStackTrace();
-            return commonError.E_FAULT;
-        }
-    }
-    
-    public commonError deleteGroup(GroupBase group) {
-        try {
-            groupRepository.deleteByUid(group.getUid());
-            return commonError.E_OK; /* succeeded */
-        } catch(Exception exp) {
-            exp.printStackTrace();
-            return commonError.E_FAULT;
-        }
-    }
-
-    /*
-     * Get instance from database
-     */
     public GroupBase getGroupByUid(String uid) {
         try {
             return groupRepository.findByUid(uid);
@@ -105,97 +59,6 @@ public class RoutineServiceImpl implements RoutineService {
         } catch(Exception exp) {
             exp.printStackTrace();
             return null;
-        }
-    }
-    
-    /*
-     * Add/Remove Member to/from Group
-     */
-    public commonError addGroupMember(GroupBase group, UserBase user) {
-        try {
-            if (user.getType() != UserType.USER_ATTENDEE) {
-                return commonError.E_PERMISSION_DENIED; /* the user must be an attendee */
-            }
-            commonError rc = group.addMember(user.getOpenId());
-            if (rc.succeeded()) {
-                groupRepository.save(group);
-            }
-            return rc;
-        } catch(Exception exp) {
-            exp.printStackTrace();
-            return commonError.E_FAULT;
-        }
-    }
-    public commonError removeGroupMember(GroupBase group, UserBase user) {
-        try {
-            commonError rc = group.removeMember(user.getOpenId());
-            if (rc.succeeded()) {
-                groupRepository.save(group);
-            }
-            return rc;
-        } catch(Exception exp) {
-            exp.printStackTrace();
-            return commonError.E_FAULT;
-        }
-    }
-    
-    /*
-     * Add/Remove Activity to/from Group
-     */
-    public commonError addGroupActivity(GroupBase group, ActivityBase activity) {
-        try {
-            commonError rc = group.addActivity(activity.getUid());
-            if (rc.succeeded()) {
-                groupRepository.save(group);
-            }
-            return rc;
-        } catch(Exception exp) {
-            exp.printStackTrace();
-            return commonError.E_FAULT;
-        }
-    }
-    public commonError removeGroupActivity(GroupBase group, ActivityBase activity) {
-        try {
-            commonError rc = group.removeActivity(activity.getUid());
-            if (rc.succeeded()) {
-                groupRepository.save(group);
-                
-                activityRepository.delete(activity); /* definitely remove from repository */
-            }
-            return rc;
-        } catch(Exception exp) {
-            exp.printStackTrace();
-            return commonError.E_FAULT;
-        }
-    }
-    
-    /*
-     * Add/Remove Task to/from Activity
-     */
-    public commonError addActivityTask(ActivityBase activity, TaskBase task) {
-        try {
-            commonError rc = activity.addTask(task.getUid());
-            if (rc.succeeded()) {
-                activityRepository.save(activity);
-            }
-            return rc;
-        } catch(Exception exp) {
-            exp.printStackTrace();
-            return commonError.E_FAULT;
-        }
-    }
-    public commonError removeActivityTask(ActivityBase activity, TaskBase task) {
-        try {
-            commonError rc = activity.removeTask(task.getUid());
-            if (rc.succeeded()) {
-                activityRepository.save(activity);
-                
-                taskRepository.delete(task); /* definitely remove from repository */
-            }
-            return rc;
-        } catch(Exception exp) {
-            exp.printStackTrace();
-            return commonError.E_FAULT;
         }
     }
     

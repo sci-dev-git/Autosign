@@ -17,7 +17,6 @@
  */
 package com.autosig.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +29,11 @@ import com.autosig.error.commonError;
 import com.autosig.annotation.RoutineResolver;
 import com.autosig.annotation.Authorization;
 import com.autosig.annotation.CurrentActivity;
+import com.autosig.annotation.CurrentUser;
 import com.autosig.domain.ActivityBase;
 import com.autosig.domain.TaskBase;
-import com.autosig.domain.UserType;
+import com.autosig.domain.UserBase;
+import com.autosig.service.UserService;
 import com.autosig.service.RoutineService;
 import com.autosig.util.ResponseWrapper;
 
@@ -40,6 +41,8 @@ import com.autosig.util.ResponseWrapper;
 public class ActivityController {
     @Autowired
     private RoutineService routineService;
+    @Autowired
+    private UserService userService;
 
     /**
      * API for group manager to add a new Task in Activity.
@@ -49,17 +52,17 @@ public class ActivityController {
      */
     @RequestMapping(value = "/activity/create_task", method = RequestMethod.GET)
     @RoutineResolver(type = RoutineResolver.routineType.ACTIVITY)
-    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
-    public String createTask(@CurrentActivity ActivityBase activity,
+    @Authorization
+    public String createTask(@CurrentUser UserBase user,
+            @CurrentActivity ActivityBase activity,
             @RequestParam(value="name") String name) {
 
-        TaskBase task = new TaskBase(true); /* create instance of task */
+        TaskBase task = new TaskBase(true);
         task.setName(name);
+        task.setCreatorOpenId(user.getOpenId());
         
-        commonError rc = routineService.createTask(task);
+        commonError rc = userService.createTask(activity, task);
         if (rc.succeeded()) {
-            rc = routineService.addActivityTask(activity, task);
-            
             JSONObject body = new JSONObject();
             body.put("uid", task.getUid());
             return ResponseWrapper.wrapResponse(rc, body);
@@ -75,16 +78,21 @@ public class ActivityController {
      */
     @RequestMapping(value = "/activity/remove_task", method = RequestMethod.GET)
     @RoutineResolver(type = RoutineResolver.routineType.ACTIVITY)
-    @Authorization(userLimited = true, userType = UserType.USER_MANAGER)
-    public String removeTask(@CurrentActivity ActivityBase activity,
+    @Authorization
+    public String removeTask(@CurrentUser UserBase user,
+            @CurrentActivity ActivityBase activity,
             @RequestParam(value="task_uid") String taskUid) {
 
+        if (activity.getCreatorOpenId().compareTo(user.getOpenId()) != 0) { /* validate ownership */
+            return ResponseWrapper.wrapResponse(commonError.E_PERMISSION_DENIED, null);
+        }
+        
         TaskBase task = routineService.getTaskByUid(taskUid);
         if (task == null) {
             return ResponseWrapper.wrapResponse(commonError.E_TASK_NON_EXISTING, null);
         }
         
-        commonError rc = routineService.removeActivityTask(activity, task);
+        commonError rc = userService.deleteTask(activity, task);
         return ResponseWrapper.wrapResponse(rc, null);
     }
     
@@ -98,13 +106,8 @@ public class ActivityController {
     public String getTasks(@CurrentActivity ActivityBase activity) {
         
         JSONObject body = new JSONObject();
-        List<TaskBase> tasks = new ArrayList<TaskBase>();
-        
-        List<String> taskIds = activity.getTasks();
-        for(int i=0; i < taskIds.size(); i++) {
-            tasks.add(routineService.getTaskByUid(taskIds.get(i)) );
-        }
-        
+        List<TaskBase> tasks = activity.getTasks();
+
         body.put("size", tasks.size());
         body.put("tasks", tasks);
         return ResponseWrapper.wrapResponse(commonError.E_OK, body);

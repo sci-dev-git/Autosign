@@ -18,7 +18,9 @@
 package com.autosig.service;
 
 import com.autosig.domain.UserBase;
+import com.autosig.domain.ActivityBase;
 import com.autosig.domain.GroupBase;
+import com.autosig.domain.TaskBase;
 import com.autosig.error.commonError;
 
 public interface UserService {
@@ -30,14 +32,12 @@ public interface UserService {
     public commonError registerUser(UserBase user);
 
     /**
-     * User authority.
-     * @param openId Target OpenID acquired by wx.
-     * @param code Secondary ID.
-     * @param password Encoded password.
-     * @return authorization error pack.
+     * Get the openId of wx user.
+     * @param wxcode Internal code acquired from wx.
+     * @return openId if the authority is succeeded. Otherwise null pointer.
      */
-    public commonError authorizeUser(String openId, String code, String password);
-
+    public String getOpenId(String wxcode);
+    
     /**
      * Get the instance reference of a user by its OpenID.
      * @param id Target OpenID
@@ -46,17 +46,73 @@ public interface UserService {
     public UserBase getUserByOpenId(String id);
     
     /**
-     * Add a group to user.
+     * Create a group.
+     * Build reference user <--> group
      * @param user Target User.
-     * @param group Source Group
+     * @param group Source group.
      * @return common status code.
      */
-    public commonError addGroup(UserBase user, GroupBase group);
+    public commonError createGroup(UserBase user, GroupBase group);
+    
     /**
-     * Delete a group from user. Warning: group will NOT be removed from database.
+     * Delete a group created by user.
+     * Break reference user <--> group
      * @param user Target User.
      * @param group Source Group
      * @return common status code.
      */
     public commonError deleteGroup(UserBase user, GroupBase group);
+    
+    /**
+     * Attend a group.
+     * Build reference user <--> group
+     * @param user Target User.
+     * @param group Source Group
+     * @return common status code.
+     */
+    public commonError attendGroup(UserBase user, GroupBase group);
+    /**
+     * Quit a group.
+     * Break reference user <--> group
+     * @param user Target User.
+     * @param group Source Group
+     * @return common status code.
+     */
+    public commonError quitGroup(UserBase user, GroupBase group);
+    
+    /**
+     * Create a activity in Group.
+     * Build reference group <--> activity
+     * @param group Target activity.
+     * @param activity Source activity.
+     * @return common status code.
+     */
+    public commonError createActivity(GroupBase group, ActivityBase activity);
+    
+    /**
+     * Delete Activity from Group.
+     * Break reference group <--> activity
+     * @param group Target group
+     * @param activity Source Activity
+     * @return
+     */
+    public commonError deleteActivity(GroupBase group, ActivityBase activity);
+    
+    /**
+     * Create a task in database.
+     * Build reference activity <--> task
+     * @param activity Target activity
+     * @param task Source task
+     * @return common status code.
+     */
+    public commonError createTask(ActivityBase activity, TaskBase task);
+    
+    /**
+     * Delete Task
+     * Break reference activity <--> task
+     * @param activity Target activity
+     * @param task Source task
+     * @return
+     */
+    public commonError deleteTask(ActivityBase activity, TaskBase task);
 }

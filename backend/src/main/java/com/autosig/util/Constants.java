@@ -20,4 +20,13 @@ package com.autosig.util;
 public class Constants {
     public static final long TOKEN_EXPIRES_HOUR = 6;
     public static final long SECS_PER_HOURS = 3600;
+    public static final int CHUNK_SIZE = 8192;
+    public static final String HTTP_AGENT = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1;SV1)";
+    
+    /*
+     * WX auth configurations
+     */
+    public static String wx_auth_code2session_url = "https://api.weixin.qq.com/sns/jscode2session?appid=%s&secret=%s&js_code=%s&grant_type=authorization_code";
+    public static String wx_APPID = "wx2b37f78e61f4a7b5";
+    public static String wx_SECRET = "05e42ccf5182550ee3eceae283ef42e1";
 }
