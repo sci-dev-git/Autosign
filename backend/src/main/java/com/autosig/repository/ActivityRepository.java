@@ -25,11 +25,11 @@ public interface ActivityRepository extends MongoRepository<ActivityBase, String
      * @param uuid
      * @return ActivityBase referenced to the user data
      */
-    ActivityBase findByUid(String uid);
+    public ActivityBase findByUid(String uid);
 
     /**
      * Delete Activity by uid
      * @param uuid.
      */
-    void deleteByUid(String uid);
+    public void deleteByUid(String uid);
 }

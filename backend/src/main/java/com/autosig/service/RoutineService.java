@@ -17,6 +17,7 @@
  */
 package com.autosig.service;
 import com.autosig.domain.GroupBase;
+import com.alibaba.fastjson.JSONObject;
 import com.autosig.domain.ActivityBase;
 import com.autosig.domain.TaskBase;
 import com.autosig.error.commonError;

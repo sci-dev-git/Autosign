@@ -16,8 +16,10 @@
  *  LESSER GENERAL PUBLIC LICENSE FOR MORE DETAILS.
  */
 package com.autosig.repository;
+import java.util.List;
 import com.autosig.domain.GroupBase;
 import org.springframework.data.mongodb.repository.MongoRepository;
+// import org.springframework.data.mongodb.repository.Query;
 
 public interface GroupRepository extends MongoRepository<GroupBase, String> {
     /**
@@ -25,11 +27,26 @@ public interface GroupRepository extends MongoRepository<GroupBase, String> {
      * @param uuid
      * @return GroupBase referenced to the user data
      */
-    GroupBase findByUid(String uid);
+    public GroupBase findByUid(String uid);
+    
+    /**
+     * Find group by name keyword
+     * @param place The created place of group.
+     * @param name Name keywords.
+     */
+    // @Query(value = "{ place:{$eq:?0}, name:{$regex:?1} }")
+    public List<GroupBase> findByPlaceAndNameLike(String place, String name);
+    
+    /**
+     * Find group by place where it was created.
+     * @param place
+     * @return
+     */
+    public List<GroupBase> findByPlace(String place);
 
     /**
      * Delete Group by uid
      * @param uuid.
      */
-    void deleteByUid(String uid);
+    public void deleteByUid(String uid);
 }

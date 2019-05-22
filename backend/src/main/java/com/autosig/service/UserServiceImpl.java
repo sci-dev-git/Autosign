@@ -88,6 +88,19 @@ public class UserServiceImpl implements UserService {
     
     public commonError createGroup(UserBase user, GroupBase group) {
         group.setCreatorOpenId(user.getOpenId());
+        group.setPlace(user.getPlace());
+        
+        /*
+         * Validate if there has been already a group taking the same name of new one.
+         */
+        int size = user.getCreatedGroups().size();
+        List<String> groups = user.getCreatedGroups();
+        for(int i=0; i < size; i++) {
+            GroupBase origin = this.groupRepository.findByUid(groups.get(i));
+            if (origin.getName().compareTo(group.getName()) == 0) {
+                return commonError.E_GROUP_EXISTING;
+            }
+        }
         
         commonError rc = user.addCreatedGroup(group.getUid()); // add reference to its creator
         if (rc.succeeded()) {

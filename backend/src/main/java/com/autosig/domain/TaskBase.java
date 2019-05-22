@@ -20,6 +20,7 @@ package com.autosig.domain;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
 
+import com.alibaba.fastjson.JSONObject;
 import com.autosig.util.UidGenerator;
 
 @Document(collection = "tasks")
@@ -80,6 +81,16 @@ public class TaskBase {
     }
     public void setCreatorOpenId(String creatorOpenId) {
         this.creatorOpenId = creatorOpenId;
+    }
+    
+    public JSONObject getBasicInfo() {
+        JSONObject info = new JSONObject();
+        info.put("name", name);
+        info.put("host", host);
+        info.put("place", place);
+        info.put("uid", uid);
+        
+        return info;
     }
 }
 

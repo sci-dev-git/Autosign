@@ -34,8 +34,12 @@ public class GroupBase {
     public String uid;
     /** The name of this group */
     public String name;
+    /** Short description */
+    public String desc;
     /** openId of creator */
     public String creatorOpenId;
+    /** place where created this group */
+    public String place;
     /** list of Members references */
     @DBRef
     public List<UserBase> members;
@@ -84,6 +88,20 @@ public class GroupBase {
     }
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public String getDesc() {
+        return desc;
+    }
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+    
+    public String getPlace() {
+        return place;
+    }
+    public void setPlace(String place) {
+        this.place = place;
     }
 
     public List<UserBase> getMembers() {

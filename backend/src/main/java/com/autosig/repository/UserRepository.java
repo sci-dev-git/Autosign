@@ -25,11 +25,11 @@ public interface UserRepository extends MongoRepository<UserBase, String> {
      * @param openId Target User OpenID
      * @return UserBase referenced to the user data
      */
-    UserBase findByOpenId(String openId);
+    public UserBase findByOpenId(String openId);
 
     /**
      * Delete User
      * @param openId  Identify of user.
      */
-    void deleteByOpenId(String openId);
+    public void deleteByOpenId(String openId);
 }

@@ -66,9 +66,11 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
                 String openId = tokenService.getOpenId(token);
                 UserBase user = userRepository.findByOpenId(openId); /* acquire the user from repository */
 
-                /* succeeded. Store the openId, corresponding to the token, to the request for later injection. */
-                request.setAttribute("currentUser", user);
-                return true;
+                if (user != null) {
+                    /* succeeded. Store the openId, corresponding to the token, to the request for later injection. */
+                    request.setAttribute("currentUser", user);
+                    return true;
+                }
             }
           
             /*

@@ -68,6 +68,9 @@ public class UserBase {
     public List<String> getCreatedGroups() {
         return createdGroups;
     }
+    public List<String> getAttendedGroups() {
+        return attendedGroups;
+    }
     
     public void setRealName(String realName) {
         this.realName = realName;
@@ -76,7 +79,7 @@ public class UserBase {
         this.code = code;
     }
     public void setPlace(String place) {
-        this.place = code;
+        this.place = place;
     }
     public void setOpenId(String openId) {
         this.openId = openId;
@@ -120,8 +123,10 @@ public class UserBase {
      */
     public JSONObject getBasicInfo() {
         JSONObject userInfo = new JSONObject();
-        userInfo.put("openId", openId);
         userInfo.put("realName", realName);
+        userInfo.put("code", code);
+        userInfo.put("place", place);
+        userInfo.put("openId", openId);
         
         return userInfo;
     }
