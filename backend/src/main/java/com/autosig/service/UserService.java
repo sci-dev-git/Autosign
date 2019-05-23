@@ -20,7 +20,6 @@ package com.autosig.service;
 import com.autosig.domain.UserBase;
 import com.autosig.domain.ActivityBase;
 import com.autosig.domain.GroupBase;
-import com.autosig.domain.TaskBase;
 import com.autosig.error.commonError;
 
 public interface UserService {
@@ -97,22 +96,5 @@ public interface UserService {
      * @return
      */
     public commonError deleteActivity(GroupBase group, ActivityBase activity);
-    
-    /**
-     * Create a task in database.
-     * Build reference activity <--> task
-     * @param activity Target activity
-     * @param task Source task
-     * @return common status code.
-     */
-    public commonError createTask(ActivityBase activity, TaskBase task);
-    
-    /**
-     * Delete Task
-     * Break reference activity <--> task
-     * @param activity Target activity
-     * @param task Source task
-     * @return
-     */
-    public commonError deleteTask(ActivityBase activity, TaskBase task);
+
 }

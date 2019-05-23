@@ -17,14 +17,9 @@
  */
 package com.autosig.domain;
 
-import java.util.List;
-import java.util.LinkedList;
-
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.annotation.Id;
-
-import com.autosig.error.commonError;
+import com.alibaba.fastjson.JSONObject;
 import com.autosig.util.UidGenerator;
 
 @Document(collection = "activities")
@@ -34,46 +29,23 @@ public class ActivityBase {
     public String uid;
     /** name (i.e main title) of this activity */
     public String name;
+    /** place where hold this task */
+    public String where;
+    /** indicate who hosts or manages this task */
+    public String host;
+    /** time expression */
+    public String timeExp;
     /** openId of creator */
     public String creatorOpenId;
-    /** list of Task references */
-    @DBRef
-    List<TaskBase> tasks;
 
-    public ActivityBase() {
-        this.init();
-    }
     public ActivityBase(boolean allocUid) {
         if (allocUid)
             this.uid = UidGenerator.randomUid();
-        this.init();
     }
-    
-    private void init() {
-        this.tasks = new LinkedList<TaskBase>();
-    }
-    
+
     @Override
     public boolean equals(Object src) {
         return uid.compareTo(((ActivityBase)src).uid) == 0;
-    }
-    
-    /*
-     * Operations on lists
-     */
-    public commonError addTask(TaskBase task) {
-        if (tasks.contains(task)) {
-            return commonError.E_TASK_EXISTING; /* disable duplicated adding */
-        }
-        this.tasks.add(task);
-        return commonError.E_OK;
-    }
-    public commonError removeTask(TaskBase task) {
-        if (!tasks.contains(task)) {
-            return commonError.E_TASK_NON_EXISTING;
-        }
-        this.tasks.remove(task);
-        return commonError.E_OK;
     }
     
     /*
@@ -88,9 +60,35 @@ public class ActivityBase {
     public String getName() {
         return name;
     }
+    
+    public String getWhere() {
+        return where;
+    }
+
+    public void setWhere(String where) {
+        this.where = where;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
+
+    public String getTimeExp() {
+        return timeExp;
+    }
+
+    public void setTimeExp(String timeExp) {
+        this.timeExp = timeExp;
+    }
+
     public String getCreatorOpenId() {
         return creatorOpenId;
     }
@@ -98,7 +96,15 @@ public class ActivityBase {
         this.creatorOpenId = creatorOpenId;
     }
 
-    public List<TaskBase> getTasks() {
-        return tasks;
+    public JSONObject getBasicInfo() {
+        JSONObject info = new JSONObject();
+        info.put("name", name);
+        info.put("host", host);
+        info.put("where", where);
+        info.put("uid", uid);
+        info.put("timeexp", timeExp);
+        info.put("creatorOpenId", creatorOpenId);
+        
+        return info;
     }
 }

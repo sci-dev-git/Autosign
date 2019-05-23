@@ -30,8 +30,6 @@ public class WebConfiguration implements WebMvcConfigurer {
     @Autowired
     private CurrentActivityMethodArgumentResolver currentAcitivityMethodArgumentResolver;
     @Autowired
-    private CurrentTaskMethodArgumentResolver currentTaskMethodArgumentResolver;
-    @Autowired
     private AuthorizationInterceptor authorizationInterceptor;
     @Autowired
     private RoutineResolverInterceptor routineResolverInterceptor;
@@ -49,6 +47,5 @@ public class WebConfiguration implements WebMvcConfigurer {
         argumentResolvers.add(currentUserMethodArgumentResolver);
         argumentResolvers.add(currentGroupMethodArgumentResolver);
         argumentResolvers.add(currentAcitivityMethodArgumentResolver);
-        argumentResolvers.add(currentTaskMethodArgumentResolver);
     }
 }

@@ -31,7 +31,7 @@ import java.lang.annotation.Documented;
 @Documented
 public @interface RoutineResolver {
     enum routineType {
-        GROUP, ACTIVITY, TASK
+        GROUP, ACTIVITY
     }
     /** Indicates the type of target routine. */
     routineType type() default routineType.GROUP;

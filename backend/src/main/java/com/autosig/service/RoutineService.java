@@ -19,7 +19,6 @@ package com.autosig.service;
 import com.autosig.domain.GroupBase;
 import com.alibaba.fastjson.JSONObject;
 import com.autosig.domain.ActivityBase;
-import com.autosig.domain.TaskBase;
 import com.autosig.error.commonError;
 
 /**
@@ -44,18 +43,12 @@ public interface RoutineService {
      * @return
      */
     public ActivityBase getActivityByUid(String uid);
-    
-    /**
-     * Get instance of Task by uid
-     * @param uid
-     * @return
-     */
-    public TaskBase getTaskByUid(String uid);
 
     /**
-     * Rename a Group.
+     * Update the information of a Group.
      * @param group Target group
      * @param name New name string.
+     * @param desc Descriptions.
      */
-    public commonError renameGroup(GroupBase group, String name);
+    public commonError updateGroupInfo(GroupBase group, String name, String desc);
 }

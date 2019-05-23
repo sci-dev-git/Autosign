@@ -19,10 +19,8 @@ package com.autosig.service;
 
 import com.autosig.repository.GroupRepository;
 import com.autosig.repository.ActivityRepository;
-import com.autosig.repository.TaskRepository;
 import com.autosig.domain.ActivityBase;
 import com.autosig.domain.GroupBase;
-import com.autosig.domain.TaskBase;
 import com.autosig.error.commonError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,9 +32,7 @@ public class RoutineServiceImpl implements RoutineService {
     private GroupRepository groupRepository;
     @Autowired
     private ActivityRepository activityRepository;
-    @Autowired
-    private TaskRepository taskRepository;
-    
+
     public GroupBase getGroupByUid(String uid) {
         try {
             return groupRepository.findByUid(uid);
@@ -53,18 +49,11 @@ public class RoutineServiceImpl implements RoutineService {
             return null;
         }
     }
-    public TaskBase getTaskByUid(String uid) {
-        try {
-            return taskRepository.findByUid(uid);
-        } catch(Exception exp) {
-            exp.printStackTrace();
-            return null;
-        }
-    }
-    
-    public commonError renameGroup(GroupBase group, String name) {
+
+    public commonError updateGroupInfo(GroupBase group, String name, String desc) {
         try {
             group.setName(name);
+            group.setDesc(desc);
             groupRepository.save(group);
             return commonError.E_OK;
         } catch(Exception exp) {

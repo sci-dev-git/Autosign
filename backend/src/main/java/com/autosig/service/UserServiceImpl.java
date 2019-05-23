@@ -21,12 +21,10 @@ import java.util.List;
 
 import com.autosig.repository.ActivityRepository;
 import com.autosig.repository.GroupRepository;
-import com.autosig.repository.TaskRepository;
 import com.autosig.repository.UserRepository;
 import com.autosig.domain.UserBase;
 import com.autosig.domain.ActivityBase;
 import com.autosig.domain.GroupBase;
-import com.autosig.domain.TaskBase;
 import com.autosig.error.commonError;
 import com.autosig.util.HttpRequest;
 import com.autosig.util.Constants;
@@ -44,8 +42,6 @@ public class UserServiceImpl implements UserService {
     private GroupRepository groupRepository;
     @Autowired
     private ActivityRepository activityRepository;
-    @Autowired
-    private TaskRepository taskRepository;
     
     public commonError registerUser(UserBase user) {
         try {
@@ -225,48 +221,9 @@ public class UserServiceImpl implements UserService {
     public commonError deleteActivity(GroupBase group, ActivityBase activity) {
         commonError rc = group.removeActivity(activity); // remove reference from group
         if (rc.succeeded()) {
-            /*
-             * Delete tasks belongs to this activity
-             */
-            List<TaskBase> tasks = activity.getTasks();
-            int size = tasks.size();
-            for(int i=0; i < size; i++) {
-                rc = this.deleteTask(activity, tasks.get(i));
-                if (rc.failed()) {
-                    return rc; // FIXME how about restoration?
-                }
-            }
             try {
                 groupRepository.save(group);
                 activityRepository.delete(activity);
-            } catch(Exception exp) {
-                exp.printStackTrace();
-                return commonError.E_FAULT;
-            }
-        }
-        return rc;
-    }
-    
-    public commonError createTask(ActivityBase activity, TaskBase task) {
-        commonError rc = activity.addTask(task); // add reference to activity
-        if (rc.succeeded()) {
-            try {
-                taskRepository.save(task);
-                activityRepository.save(activity);
-            } catch(Exception exp) {
-                exp.printStackTrace();
-                return commonError.E_FAULT;
-            }
-        }
-        return commonError.E_OK; /* succeeded */
-    }
-    
-    public commonError deleteTask(ActivityBase activity, TaskBase task) {
-        commonError rc = activity.removeTask(task); // remove reference from activity
-        if (rc.succeeded()) {
-            try {
-                activityRepository.save(activity);
-                taskRepository.delete(task);
             } catch(Exception exp) {
                 exp.printStackTrace();
                 return commonError.E_FAULT;

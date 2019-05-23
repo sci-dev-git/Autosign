@@ -34,7 +34,6 @@ import com.autosig.repository.GroupRepository;
 import com.autosig.util.ResponseWrapper;
 import com.autosig.domain.ActivityBase;
 import com.autosig.domain.GroupBase;
-import com.autosig.domain.TaskBase;
 import com.autosig.domain.UserBase;
 import com.autosig.error.commonError;
 import com.autosig.annotation.CurrentUser;
@@ -187,6 +186,20 @@ public class UserController {
         return ResponseWrapper.wrapResponse(rc, null);
     }
     
+    private void responseGetGroups(JSONObject resp, List<String> groupIds) {
+        /*
+         * Resolve all the groups from repository
+         */
+        List<GroupBase> groups = new ArrayList<GroupBase>();
+        int size = groupIds.size();
+        for(int i=0; i < size; i++) {
+            groups.add(routineService.getGroupByUid(groupIds.get(i)));
+        }
+        
+        resp.put("size", groups.size());
+        resp.put("groups", groups);
+    }
+    
     /**
      * API for Getting all Groups created by this user.
      * @return
@@ -196,19 +209,19 @@ public class UserController {
     public String getCreatedGroups(@CurrentUser UserBase user) {
         
         JSONObject body = new JSONObject();
-        
-        /*
-         * Resolve all the groups from repository
-         */
-        List<GroupBase> groups = new ArrayList<GroupBase>();
-        List<String> groupIds = user.getCreatedGroups();
-        int size = groupIds.size();
-        for(int i=0; i < size; i++) {
-            groups.add(routineService.getGroupByUid(groupIds.get(i)));
-        }
-        
-        body.put("size", groups.size());
-        body.put("groups", groups);
+        responseGetGroups(body, user.getCreatedGroups());
+        return ResponseWrapper.wrapResponse(commonError.E_OK, body);
+    }
+    
+    /**
+     * API for getting attended groups.
+     * @return
+     */
+    @RequestMapping(value = "/usr/get_attended_groups", method = RequestMethod.GET)
+    @Authorization
+    public String getAttendedGroups(@CurrentUser UserBase user) {
+        JSONObject body = new JSONObject();
+        responseGetGroups(body, user.getAttendedGroups());
         return ResponseWrapper.wrapResponse(commonError.E_OK, body);
     }
     
@@ -294,24 +307,16 @@ public class UserController {
             for(int j=0; j < activitiesSize; j++) { /* walk through activity */
                 
                 ActivityBase activity = activities.get(j);
-                List<TaskBase> tasks = activity.getTasks();
-                int tasksSize = tasks.size();
-                for(int k=0; k < tasksSize; k++) { /* walk through tasks */
-                    
-                    JSONObject activitiyNode = new JSONObject();
-                    activitiyNode.put("uid", activity.getUid());
-                    activitiyNode.put("name", activity.getName());
-                    
-                    JSONObject groupNode = new JSONObject();
-                    groupNode.put("uid", group.getUid());
-                    groupNode.put("name", group.getName());
-                    
-                    TaskBase task = tasks.get(k);
-                    JSONObject info = task.getBasicInfo();
-                    info.put("activity", activitiyNode);
-                    info.put("group", groupNode);
-                    taskArray.add(info);
-                }
+                JSONObject activitiyNode = activity.getBasicInfo();
+                
+                JSONObject groupNode = new JSONObject();
+                groupNode.put("uid", group.getUid());
+                groupNode.put("name", group.getName());
+                
+                JSONObject info = new JSONObject();
+                info.put("activity", activitiyNode);
+                info.put("group", groupNode);
+                taskArray.add(info);
             }
         }
         

@@ -65,10 +65,6 @@ public class RoutineResolverInterceptor implements HandlerInterceptor {
                 routine = routineService.getActivityByUid(uid);
                 error = commonError.E_ACTIVITY_NON_EXISTING;
                 break;
-            case TASK:
-                routine = routineService.getTaskByUid(uid);
-                error = commonError.E_TASK_NON_EXISTING;
-                break;
             }
            
             if (routine == null) {
